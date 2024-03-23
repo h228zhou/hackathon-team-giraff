@@ -10,7 +10,7 @@ def index():
 def submit():
     # Extracting the TRPG topic
     topic = request.form['selectedTopic']
-    
+    haha = 1
     # Extracting the number of players
     num_players = request.form['playerCount']
     
