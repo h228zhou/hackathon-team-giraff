@@ -1,73 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TRPG Session Setup</title>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('playerCount').addEventListener('change', function () {
-        const playerSection = document.getElementById('playerSection');
-        playerSection.innerHTML = ''; // Clear previous inputs
-        const numberOfPlayers = parseInt(this.value, 10);
 
-        for (let i = 1; i <= numberOfPlayers; i++) {
-            const playerInput = document.createElement('div');
-            playerInput.innerHTML = `
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRPG Session Setup</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('playerCount').addEventListener('change', function () {
+                const playerSection = document.getElementById('playerSection');
+                playerSection.innerHTML = ''; // Clear previous inputs
+                const numberOfPlayers = parseInt(this.value, 10);
+
+                for (let i = 1; i <= numberOfPlayers; i++) {
+                    const playerInput = document.createElement('div');
+                    playerInput.innerHTML = `
                 <label for="player${i}Name">Player ${i} Name:</label>
                 <input type="text" id="player${i}Name" name="player${i}Name">
                 <label for="player${i}Phone">Phone:</label>
                 <input type="tel" id="player${i}Phone" name="player${i}Phone">
             `;
-            playerSection.appendChild(playerInput);
+                    playerSection.appendChild(playerInput);
+                }
+            });
+        });
+
+        function submitForm() {
+            const topic = document.getElementById('selectedTopic').value;
+            const playerCount = document.getElementById('playerCount').value;
+
+            const formData = new FormData();
+            formData.append('selectedTopic', topic);
+            formData.append('playerCount', playerCount);
+
+            for (let i = 1; i <= playerCount; i++) {
+                formData.append(`player${i}Name`, document.getElementById(`player${i}Name`).value);
+                formData.append(`player${i}Phone`, document.getElementById(`player${i}Phone`).value);
+            }
+
+            fetch('/submit', {
+                method: 'POST',
+                body: formData,
+            })
+                .then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                    } else {
+                        window.location.href = '/game';
+                    }
+                })
+                .then(data => console.log(data))
+                .catch(error => console.error('Error:', error));
+
+
         }
-    });
-});
 
-function submitForm() {
-    const topic = document.getElementById('selectedTopic').value;
-    const playerCount = document.getElementById('playerCount').value;
-    
-    const formData = new FormData();
-    formData.append('selectedTopic', topic);
-    formData.append('playerCount', playerCount);
-    
-    for (let i = 1; i <= playerCount; i++) {
-        formData.append(`player${i}Name`, document.getElementById(`player${i}Name`).value);
-        formData.append(`player${i}Phone`, document.getElementById(`player${i}Phone`).value);
-    }
-    
-    fetch('/submit', {
-        method: 'POST',
-        body: formData,
-    })
-    .then(response => response.json())
-    .then(data => console.log(data))
-    .catch(error => console.error('Error:', error));
-}
-
-</script>
+    </script>
 </head>
+
 <body>
 
-<h2>Select TRPG Topic</h2>
-<button onclick="document.getElementById('selectedTopic').value='Fantasy'">Fantasy</button>
-<button onclick="document.getElementById('selectedTopic').value='Sci-Fi'">Sci-Fi</button>
-<button onclick="document.getElementById('selectedTopic').value='Horror'">Horror</button>
-<button onclick="document.getElementById('selectedTopic').value='Adventure'">Adventure</button>
-<button onclick="document.getElementById('selectedTopic').value='Mystery'">Mystery</button>
-<input type="hidden" id="selectedTopic" name="selectedTopic">
+    <h2>Select TRPG Topic</h2>
+    <button onclick="document.getElementById('selectedTopic').value='Fantasy'">Fantasy</button>
+    <button onclick="document.getElementById('selectedTopic').value='Sci-Fi'">Sci-Fi</button>
+    <button onclick="document.getElementById('selectedTopic').value='Horror'">Horror</button>
+    <button onclick="document.getElementById('selectedTopic').value='Adventure'">Adventure</button>
+    <button onclick="document.getElementById('selectedTopic').value='Mystery'">Mystery</button>
+    <input type="hidden" id="selectedTopic" name="selectedTopic">
 
-<div>
-    <label for="playerCount">Number of Players:</label>
-    <input type="number" id="playerCount" name="playerCount" min="1" max="10">
-</div>
+    <div>
+        <label for="playerCount">Number of Players:</label>
+        <input type="number" id="playerCount" name="playerCount" min="1" max="10">
+    </div>
 
-<div id="playerSection">
-    <!-- Player inputs will be added here -->
-</div>
+    <div id="playerSection">
+        <!-- Player inputs will be added here -->
+    </div>
 
-<button onclick="submitForm()">Submit</button>
+    <button onclick="submitForm()">Submit</button>
 
 </body>
+
 </html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Game Details</title>
+</head>
+
+<body>
+    <h1>Game in Progress</h1>
+    {% if game_setup %}
+    <ul>
+        <li>Topic: {{ game_setup.topic }}</li>
+        <li>Number of Players: {{ game_setup.num_players }}</li>
+
+        {% for player in game_setup.players_info %}
+        <li>{{ player.name }}</li>
+        <li>Phone: {{ player.phone }}</li>
+        {% endfor %}
+
+    </ul>
+    {% else %}
+    <p>No games found.</p>
+    {% endif %}
+    <p>
+        <a href="/">Back to Setup</a>
+    </p>
+
+</body>
+
+</html>
