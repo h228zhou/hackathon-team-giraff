@@ -2,6 +2,21 @@
 <html lang="en">
 
 <head>
+    <style>
+        .topicBtn {
+            background-color: #f4f4f4;
+            /* Light grey */
+            border: 1px solid #ccc;
+            outline: none;
+        }
+
+        .topicBtn.selected {
+            background-color: #4CAF50;
+            /* Green */
+            color: white;
+            border-color: #4CAF50;
+        }
+    </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TRPG Session Setup</title>
@@ -24,6 +39,22 @@
                 }
             });
         });
+
+        function selectTopic(topic) {
+            // Set the hidden input value
+            document.getElementById('selectedTopic').value = topic;
+
+            // Get all buttons with the class 'topicBtn'
+            var buttons = document.getElementsByClassName('topicBtn');
+
+            // Remove the 'selected' class from all buttons
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('selected');
+            }
+
+            // Add the 'selected' class to the clicked button
+            document.getElementById('btn' + topic.replace(/\s+/g, '')).classList.add('selected');
+        }
 
         function submitForm() {
             const topic = document.getElementById('selectedTopic').value;
@@ -61,11 +92,17 @@
 <body>
 
     <h2>Select TRPG Topic</h2>
-    <button onclick="document.getElementById('selectedTopic').value='Fantasy'">Fantasy</button>
+    <button id="btnFantasy" class="topicBtn" onclick="selectTopic('Fantasy')">Fantasy</button>
+    <button id="btnSciFi" class="topicBtn" onclick="selectTopic('Sci-Fi')">Sci-Fi</button>
+    <button id="btnHorror" class="topicBtn" onclick="selectTopic('Horror')">Horror</button>
+    <button id="btnAdventure" class="topicBtn" onclick="selectTopic('Adventure')">Adventure</button>
+    <button id="btnMystery" class="topicBtn" onclick="selectTopic('Mystery')">Mystery</button>
+
+    <!-- <button onclick="document.getElementById('selectedTopic').value='Fantasy'">Fantasy</button>
     <button onclick="document.getElementById('selectedTopic').value='Sci-Fi'">Sci-Fi</button>
     <button onclick="document.getElementById('selectedTopic').value='Horror'">Horror</button>
     <button onclick="document.getElementById('selectedTopic').value='Adventure'">Adventure</button>
-    <button onclick="document.getElementById('selectedTopic').value='Mystery'">Mystery</button>
+    <button onclick="document.getElementById('selectedTopic').value='Mystery'">Mystery</button> -->
     <input type="hidden" id="selectedTopic" name="selectedTopic">
 
     <div>
