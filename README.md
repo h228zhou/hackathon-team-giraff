@@ -15,7 +15,7 @@ source story-venv/bin/activate
 
 Git clone this project repo in the same folder:
 ```
-git clone <URL>
+git clone -b development <URL>
 ```
 
 Go into the repo and install the requirements.txt file in the virtual environment:
