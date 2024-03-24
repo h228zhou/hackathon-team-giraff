@@ -93,11 +93,12 @@ Ongoing Tracking:
 
 At Game Start:
 
+- Create a random character sheet following GAME rules.
+- Display full CHARACTER sheet and starting location.
+- Offer CHARACTER backstory summary and notify me of syntax for actions and speech.
 
-This should be a game for {n} different players, start with player 1, giving choice, receive his/her choice, then adjust the story, the move to next player, then repeating the step above, after all player make choice, this count as a round. After a round start a new round, continue start with player 1 as mentioned above. After receive the reply of one player move to the next player.the game will end at the {r} round, Untill the end of the game, give a conclusion.
-Start the mutiplayer game 
-
-Each response must be no more than 4000 characters and the response must be plain text
+THis should be a game for {n} different players,
+first just give the roles of {n} players and give the story background  !!!Do not include any questions or options!!!
 """
 
 @bot.message_handler(commands=['start', 'help'])
@@ -127,15 +128,26 @@ def handle_action(message):
     global player_turn
     if message.from_user.id == roles_user["Player " + str(player_turn)]:
         choice = message.json["text"]
-        gpt_messages.append({"role": "user", "content": choice})
-        gpt_response = interact_with_gpt(str(gpt_messages))
-        gpt_messages[-1]["response"] = gpt_response
+        prompt = f"choose {choice}, Describe what happens next"
+        gpt_messages.append({"role": "user", "content": prompt})
+        gpt_response = interact_with_gpt(gpt_messages)
+        gpt_messages.append({"role": "assistant", "content": gpt_response})
 
         bot.send_message(chat_id, gpt_response)
 
         player_turn += 1
         if player_turn > n:
             player_turn -= n
+            #r代表回合数
+            r -= 1
+        #如果回合结束给出游戏总结, 发到群里
+        if r==0 :
+            gpt_messages.append({"role": "user", "content": "Create an ending to the story "})
+            gpt_response = interact_with_gpt(gpt_messages)
+            bot.send_message(chat_id, gpt_response)
+            
+            
+
 
 def interact_with_gpt(prompt):
     response = gpt_client.chat.completions.create(
@@ -151,9 +163,9 @@ def game_start():
     # mute_all = ChatPermissions(can_send_messages=False)
     # unmute_all = ChatPermissions(can_send_messages=True)
     # bot.set_chat_permissions(chat_id, permissions=unmute_all)
-
-    gpt_response = interact_with_gpt(game_text)
-    gpt_messages.append({"role": "user", "content": game_text, "response": gpt_response})
+    gpt_messages.append({"role": "user", "content": game_text})
+    gpt_response = interact_with_gpt(gpt_messages)
+    gpt_messages.append({"role": "assistant", "content": gpt_response})
     bot.send_message(chat_id, gpt_response)
 
     i = 0
@@ -169,13 +181,12 @@ def game_start():
 
 def next_turn(player):
     prompt = f'''
-    Give me 3 choice for Player {player}, I will choose 1 
-    and then you need to give the story adjusted by the choice.
+    Briefly describe the plot, for Player {player}, I will choose 1.
     '''
     gpt_messages.append({"role": "user", "content": prompt})
-    gpt_response = interact_with_gpt(str(gpt_messages))
+    gpt_response = interact_with_gpt(gpt_messages)
 
-    gpt_messages[-1]["response"] = gpt_response
+    gpt_messages.append({"role": "assistant", "content": gpt_response})
 
     bot.send_message(roles_user[f"Player {player}"], gpt_response)
 
