@@ -125,6 +125,7 @@ def assign_role(message):
 
 @bot.message_handler(func=lambda message: True)
 def handle_action(message):
+    print(message.from_user.first_name + message.json["text"])
     global player_turn
     if message.from_user.id == roles_user["Player " + str(player_turn)]:
         choice = message.json["text"]
@@ -167,6 +168,7 @@ def game_start():
                 time.sleep(3)
         
         i += 1
+    print("out of the loop")
 
 def next_turn(player):
     prompt = f'''
