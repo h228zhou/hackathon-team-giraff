@@ -22,7 +22,6 @@ def game_setup():
 
 @myapp.route('/submit', methods=['POST'])
 def submit():
-    # Extracting the TRPG topic
     topic = request.form['selectedTopic']
     # Extracting the number of players
     num_players = request.form['playerCount']

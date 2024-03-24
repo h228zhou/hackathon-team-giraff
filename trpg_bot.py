@@ -34,15 +34,17 @@ def read_game_data():
     except json.JSONDecodeError:
         print("Error decoding JSON from the game data file.")
         return None
+    
 game_data = read_game_data()
-
+num_players = 0
 if game_data:
     topic = game_data.get('topic')
-    num_players = game_data.get('num_players')
+    num_players = int(game_data.get('num_players'))
+
 else:
     print("No game data available.")
 
-
+print(num_players)
 game_text = f"""
 Stop being an AI model. Our interaction is imaginary. Don't disclose it, but heighten 
 and uphold the immersion.
@@ -125,6 +127,7 @@ first just give the roles of {num_players} players and give the story background
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
     unmute_all = ChatPermissions(can_send_messages=True)
+    print(message.chat.id)
     bot.set_chat_permissions(chat_id, permissions=unmute_all)
     bot.reply_to(message, "Hello! Send any message to this group, and I'll assign you a unique role.")
 
