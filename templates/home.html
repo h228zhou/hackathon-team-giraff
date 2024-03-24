@@ -1,16 +1,52 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>TRPG Home</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #fdf6e3;
+            color: #073642;
+            text-align: center;
+            padding: 50px;
+        }
+        
+        h1 {
+            color: #b58900;
+        }
+
+        a {
+            display: inline-block;
+            background-color: #2aa198;
+            color: #fff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        a:hover {
+            background-color: #268986;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-image: url('background-image-url.jpg'); /* Add a relevant background image URL */
+            background-size: cover;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
-
 <body>
-    <h1>WELCOME TO TRPG GAME</h1>
-    <p>
-        <a href="/setup">Start a New Game</a>
-    </p>
-
+    <div class="container">
+        <h1>WELCOME TO TRPG GAME</h1>
+        <p>
+            <a href="/setup">Start a New Game</a>
+        </p>
+    </div>
 </body>
-
 </html>

@@ -3,6 +3,9 @@ import json
 import sqlite3
 import os
 import uuid
+import qrcode
+import io
+import base64
 
 myapp = Flask(__name__)
 
@@ -24,30 +27,30 @@ def submit():
     # Extracting the number of players
     num_players = request.form['playerCount']
     
-    # Extracting player names and phone numbers
-    players_info = []
-    for i in range(1, int(num_players) + 1):
-        player_name_key = f'player{i}Name'
-        player_phone_key = f'player{i}Phone'
-        player_name = request.form.get(player_name_key, '')
-        player_phone = request.form.get(player_phone_key, '')
-        players_info.append({'name': player_name, 'phone': player_phone})
-    
+    # Update the game setup data
     game_data['topic'] = topic
     game_data['num_players'] = num_players
-    game_data['players_info'] = players_info
+    # Note: Players' names and phone numbers are no longer collected or stored
+
     # Here, you can process the data or store it as needed
     print("Topic:", topic)
     print("Number of Players:", num_players)
-    print("Players Info:", players_info)
     
-    # Just returning the data for demonstration; in a real app, you might redirect or return a success response
-    return redirect(url_for('show_game'))
+    # Redirect to the game display page, or handle as needed
+    return jsonify({'status': 'success'}), 200
+
 
 @myapp.route('/game', methods=['GET'])
 def show_game():
     # Todo: Check if the game is still in progress
-    return render_template('game_start.html', game_setup=game_data)
+
+    qr = qrcode.make('https://t.me/+kMZLpdF_OT5jMjA9')
+    qr_io = io.BytesIO()
+    qr.save(qr_io, "PNG")
+    qr_io.seek(0)
+    qr_base64 = base64.b64encode(qr_io.getvalue()).decode()
+
+    return render_template('game_start.html', game_setup=game_data, qr_code=qr_base64)
 
 if __name__ == '__main__':
     myapp.run(debug=True)
