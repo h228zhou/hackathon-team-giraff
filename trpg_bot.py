@@ -18,6 +18,8 @@ user_roles = {}
 chat_id = -1002029519872
 gpt_messages = []
 
+player_turn = 1
+
 n = 3
 r = 2
 game_text = f"""
@@ -117,6 +119,7 @@ Start the mutiplayer game
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
+    print(message)
     bot.reply_to(message, "Hello! Send any message to this group, and I'll assign you a unique role.")
 
 @bot.message_handler(commands=['assign_role'])
@@ -136,7 +139,13 @@ def assign_role(message):
 
 @bot.message_handler(func=lambda message: True)
 def handle_action(message):
-    role = 
+    global player_turn
+    if message.from_user.id == roles_user["Player " + str(player_turn)]:
+        choice = message.text11
+
+        player_turn += 1
+        if player_turn > 3:
+            player_turn -= 3
 
 
 def interact_with_gpt(prompt):
@@ -155,12 +164,28 @@ def game_start():
     bot.set_chat_permissions(chat_id, permissions=mute_all)
 
     gpt_response = interact_with_gpt(game_text)
-
     gpt_messages.append({"role": "user", "content": game_text, "response": gpt_response})
+    bot.send_message(chat_id, gpt_response)
 
-    bot.send_message(roles_user["Player 1"], gpt_response)
-    bot.send_message(roles_user["Player 2"], "Another player is making a move. Please wait until you are prompted")
-    bot.send_message(roles_user["Player 3"], "Another player is making a move. Please wait until you are prompted")
+    i = 0
+    while i < r:
+        for player in range(n):
+            next_turn(player + 1)
+        
+        i += 1
+
+
+def next_turn(player):
+    prompt = f'''
+    Give me 3 choice for Player {player}, I will choose 1 
+    and then you need to give the story adjusted by the choice.
+    '''
+    gpt_messages.append({"role": "user", "content": prompt})
+    gpt_response = interact_with_gpt(gpt_messages)
+
+    gpt_messages[-1]["response"] = gpt_response
+
+    bot.send_message(roles_user[f"Player {player}"], gpt_response)
 
 def main():
     bot.polling()
