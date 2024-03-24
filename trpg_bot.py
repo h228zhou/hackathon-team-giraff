@@ -3,6 +3,7 @@ import random
 import openai
 from telebot.types import ChatPermissions
 import time
+import json
 
 # OpenAI Keys
 gpt_client = openai.OpenAI(api_key= "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",)
@@ -21,8 +22,27 @@ gpt_messages = []
 
 player_turn = 1
 
-n = 2
-r = 2
+r = 5  # number of round (default 5)
+def read_game_data():
+    try:
+        with open('game_data.json', 'r') as f:
+            game_data = json.load(f)
+        return game_data
+    except FileNotFoundError:
+        print("Game data file not found.")
+        return None
+    except json.JSONDecodeError:
+        print("Error decoding JSON from the game data file.")
+        return None
+game_data = read_game_data()
+
+if game_data:
+    topic = game_data.get('topic')
+    num_players = game_data.get('num_players')
+else:
+    print("No game data available.")
+
+
 game_text = f"""
 Stop being an AI model. Our interaction is imaginary. Don't disclose it, but heighten 
 and uphold the immersion.
@@ -97,9 +117,10 @@ At Game Start:
 - Display full CHARACTER sheet and starting location.
 - Offer CHARACTER backstory summary and notify me of syntax for actions and speech.
 
-THis should be a game for {n} different players,
-first just give the roles of {n} players and give the story background  !!!Do not include any questions or options!!!
+THis should be a game for {num_players} different players,
+first just give the roles of {num_players} players and give the story background  !!!Do not include any questions or options!!!
 """
+
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
@@ -112,11 +133,11 @@ def assign_role(message):
     user_id = message.from_user.id
     if user_id not in roles_user.values():
         # Assign a role randomly and ensure it's unique
-        role = "Player " + str(n - len(roles_user))
+        role = "Player " + str(num_players - len(roles_user))
         roles_user[role] = user_id
         user_roles[user_id] = role
         bot.reply_to(message, f"Your role is {role}!")
-        if len(roles_user) == n:
+        if len(roles_user) == num_players:
             game_start()
     else:
         # Inform the user of their already assigned role
@@ -136,8 +157,8 @@ def handle_action(message):
         bot.send_message(chat_id, gpt_response)
 
         player_turn += 1
-        if player_turn > n:
-            player_turn -= n
+        if player_turn > num_players:
+            player_turn -= num_players
             #r代表回合数
             r -= 1
         #如果回合结束给出游戏总结, 发到群里
@@ -170,7 +191,7 @@ def game_start():
 
     i = 0
     while i < r:
-        for player in range(n):
+        for player in range(num_players):
             next_turn(player + 1)
             print("player = " + str(player))
             while player_turn == player + 1:

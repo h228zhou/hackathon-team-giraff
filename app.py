@@ -36,6 +36,10 @@ def submit():
     print("Topic:", topic)
     print("Number of Players:", num_players)
     
+    # Save game_data to a file
+    with open('game_data.json', 'w') as f:
+        json.dump(game_data, f)
+    
     # Redirect to the game display page, or handle as needed
     return jsonify({'status': 'success'}), 200
 
