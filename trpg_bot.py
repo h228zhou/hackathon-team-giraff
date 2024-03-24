@@ -6,7 +6,9 @@ import time
 import json
 
 # OpenAI Keys
-gpt_client = openai.OpenAI(api_key= "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",)
+# Insert API key
+API_key = ""
+gpt_client = openai.OpenAI(api_key= API_key,)
 
 # Telebot Keys
 TOKEN = '7032284841:AAECCa6i81k0qC40AUm6wX8ec55D8R9EXGs'
@@ -22,7 +24,7 @@ gpt_messages = []
 
 player_turn = 1
 
-r = 5  # number of round (default 5)
+r = 2  # number of round (default 5)
 def read_game_data():
     try:
         with open('game_data.json', 'r') as f:
@@ -119,7 +121,7 @@ At Game Start:
 - Display full CHARACTER sheet and starting location.
 - Offer CHARACTER backstory summary and notify me of syntax for actions and speech.
 
-THis should be a game for {num_players} different players,
+This should be a game for {num_players} different players,
 first just give the roles of {num_players} players and give the story background  !!!Do not include any questions or options!!!
 """
 
@@ -148,6 +150,7 @@ def assign_role(message):
 
 @bot.message_handler(func=lambda message: True)
 def handle_action(message):
+    
     print(message.from_user.first_name + message.json["text"])
     global player_turn
     if message.from_user.id == roles_user["Player " + str(player_turn)]:
@@ -162,23 +165,11 @@ def handle_action(message):
         player_turn += 1
         if player_turn > num_players:
             player_turn -= num_players
-            #r代表回合数
-            r -= 1
-        #如果回合结束给出游戏总结, 发到群里
-        if r==0 :
-            gpt_messages.append({"role": "user", "content": "Create an ending to the story "})
-            gpt_response = interact_with_gpt(gpt_messages)
-            bot.send_message(chat_id, gpt_response)
-            
-            
 
-
-def interact_with_gpt(prompt):
+def interact_with_gpt(msgs):
     response = gpt_client.chat.completions.create(
         model="gpt-3.5-turbo",
-        messages=[
-            {"role": "user", "content": prompt}
-        ]
+        messages=msgs
     )
     return response.choices[0].message.content
 
@@ -202,10 +193,23 @@ def game_start():
         
         i += 1
     print("out of the loop")
+    gpt_messages.append({"role": "user", "content": "Create an ending to the story "})
+    gpt_response = interact_with_gpt(gpt_messages)
+    bot.send_message(chat_id, gpt_response)
+    game_end()
+
+def game_end():
+    bot.send_message(chat_id, "GAME END")
+    global player_turn
+    player_turn = 1
+    gpt_messages.clear()
+    roles_user.clear()
+    user_roles.clear()
+
 
 def next_turn(player):
     prompt = f'''
-    Briefly describe the plot, for Player {player}, I will choose 1.
+    Briefly describe the plot, for Player {player}, give three choices.
     '''
     gpt_messages.append({"role": "user", "content": prompt})
     gpt_response = interact_with_gpt(gpt_messages)
