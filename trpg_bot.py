@@ -136,8 +136,6 @@ def handle_action(message):
         player_turn += 1
         if player_turn > n:
             player_turn -= n
-            
-
 
 def interact_with_gpt(prompt):
     response = gpt_client.chat.completions.create(
