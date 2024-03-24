@@ -115,6 +115,8 @@ At Game Start:
 
 This should be a game for {n} different players, start with player 1, giving choice, receive his/her choice, then adjust the story, the move to next player, then repeating the step above, after all player make choice, this count as a round. After a round start a new round, continue start with player 1 as mentioned above. After receive the reply of one player move to the next player.the game will end at the {r} round, Untill the end of the game, give a conclusion.
 Start the mutiplayer game 
+
+Each response must be within 4000 characters and the reply must be plain text
 """
 
 @bot.message_handler(commands=['start', 'help'])
@@ -151,6 +153,7 @@ def handle_action(message):
         player_turn += 1
         if player_turn > n:
             player_turn -= n
+            
 
 
 def interact_with_gpt(prompt):
