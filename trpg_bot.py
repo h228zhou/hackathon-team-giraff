@@ -141,11 +141,16 @@ def assign_role(message):
 def handle_action(message):
     global player_turn
     if message.from_user.id == roles_user["Player " + str(player_turn)]:
-        choice = message.text11
+        choice = str(message.json.text)
+        gpt_messages.append({"role": "user", "content": choice})
+        gpt_response = interact_with_gpt(gpt_messages)
+        gpt_messages[-1]["response"] = gpt_response
+
+        bot.send_message(chat_id, gpt_response)
 
         player_turn += 1
-        if player_turn > 3:
-            player_turn -= 3
+        if player_turn > n:
+            player_turn -= n
 
 
 def interact_with_gpt(prompt):
@@ -171,9 +176,10 @@ def game_start():
     while i < r:
         for player in range(n):
             next_turn(player + 1)
+            while player_turn != player + 1:
+                
         
         i += 1
-
 
 def next_turn(player):
     prompt = f'''
